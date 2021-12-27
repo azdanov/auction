@@ -1,0 +1,32 @@
+.app {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.welcome {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.05);
+  display: block;
+  padding: 30px;
+  vertical-align: middle;
+}
+
+.welcome h1 {
+  color: #444;
+  font-size: 1.8rem;
+  font-weight: normal;
+  line-height: 1;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.welcome p {
+  color: #444;
+  font-size: 0.9rem;
+  line-height: 1;
+  margin: 0;
+  text-align: center;
+}
