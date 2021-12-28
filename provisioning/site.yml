@@ -1,0 +1,9 @@
+---
+- name: Provision Site
+  hosts: site
+  remote_user: root
+  become: yes
+  roles:
+    - docker
+    - certbot
+    - site

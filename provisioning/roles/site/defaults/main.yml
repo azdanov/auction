@@ -1,0 +1,4 @@
+certbot_email: azdanov@pm.me
+certbot_hosts:
+  - demo-auction.azdanov.dev
+  - api.demo-auction.azdanov.dev
