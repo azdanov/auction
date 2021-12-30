@@ -4,8 +4,11 @@ An auction app made in PHP and JavaScript with Slim and React
 
 ## Development Setup
 
+- Initialize project `make init`
 - Start docker compose `make up`
 - Stop docker compose `make down`
+
+To install composer dependencies use `docker compose run --rm api-php-cli composer`
 
 ## Production Setup
 

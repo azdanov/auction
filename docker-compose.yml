@@ -1,7 +1,8 @@
 services:
   gateway:
     build:
-      context: gateway/docker/development/nginx
+      context: gateway/docker
+      dockerfile: development/nginx/Dockerfile
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -10,18 +11,33 @@ services:
       - api
   frontend:
     build:
-      context: frontend/docker/development/nginx
+      context: frontend/docker
+      dockerfile: development/nginx/Dockerfile
     volumes:
       - ./frontend:/app
   api:
     build:
-      context: api/docker/development/nginx
+      context: api/docker
+      dockerfile: development/nginx/Dockerfile
     volumes:
       - ./api:/app
     depends_on:
       - api-php-fpm
   api-php-fpm:
     build:
-      context: api/docker/development/php-fpm
+      context: api/docker
+      dockerfile: development/php-fpm/Dockerfile
+    environment:
+      APP_DEBUG: 1
+      APP_ENV: dev
+    volumes:
+      - ./api:/app
+  api-php-cli:
+    build:
+      context: api/docker
+      dockerfile: development/php-cli/Dockerfile
+    environment:
+      APP_DEBUG: 1
+      APP_ENV: dev
     volumes:
       - ./api:/app
