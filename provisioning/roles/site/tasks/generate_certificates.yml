@@ -1,4 +1,25 @@
 ---
+- name: Ensure openssl is installed.
+  apt:
+    name: openssl
+
+- name: Find path to the OpenSSL binary.
+  command: which openssl
+  register: dhparam__which_openssl
+  changed_when: false
+
+- name: Remember path to OpenSSL binary.
+  set_fact:
+    dhparam__openssl_binary: "{{ dhparam__which_openssl.stdout }}"
+
+- name: Stat the DHE parameter file.
+  stat: path="{{ openssl_dh_param_location }}"
+  register: dh_param
+
+- name: Generate DHE parameter file (might take a while).
+  command: "'{{ dhparam__openssl_binary }}' dhparam -out '{{ dhparam_path }}' {{ dhparam_size }}"
+  when: dh_param.stat.exists == False
+
 - name: Check if certificate already exists
   stat:
     path: /etc/letsencrypt/live/{{ item }}/cert.pem

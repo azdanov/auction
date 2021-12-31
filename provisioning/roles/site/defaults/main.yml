@@ -1,3 +1,5 @@
+dhparam_size: 2048
+dhparam_path: "/etc/letsencrypt/live/dhparam.pem"
 certbot_email: azdanov@pm.me
 certbot_hosts:
   - demo-auction.azdanov.dev
