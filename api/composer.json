@@ -5,7 +5,10 @@
   "license": "BSD-3-Clause",
   "config": {
     "process-timeout": 0,
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true
+    }
   },
   "require": {
     "php": "^8.1",
@@ -16,7 +19,12 @@
     "symfony/console": "^6.0"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest"
+    "friendsofphp/php-cs-fixer": "^3.4",
+    "lctrs/psalm-psr-container-plugin": "^1.7",
+    "overtrue/phplint": "^4.0",
+    "psalm/plugin-phpunit": "^0.16.1",
+    "roave/security-advisories": "dev-latest",
+    "vimeo/psalm": "^4.16"
   },
   "autoload": {
     "psr-4": {
@@ -24,6 +32,9 @@
     }
   },
   "scripts": {
+    "lint": "phplint",
+    "php-cs-fixer": "php-cs-fixer --config=.php-cs-fixer.php --allow-risky=yes",
+    "psalm": "psalm",
     "app": "php bin/app.php --ansi"
   }
 }

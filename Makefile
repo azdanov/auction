@@ -14,6 +14,18 @@ docker-pull:
 docker-build:
 	docker-compose build --pull
 
+lint: api-lint
+analyze: api-analyze
+api-lint:
+	docker-compose run --rm api-php-cli composer lint
+	docker-compose run --rm api-php-cli composer php-cs-fixer fix -- --dry-run --diff
+api-cs-fix:
+	docker-compose run --rm api-php-cli composer php-cs-fixer fix
+api-analyze:
+	docker-compose run --rm api-php-cli composer psalm -- --no-diff
+api-analyze-diff:
+	docker-compose run --rm api-php-cli composer psalm
+
 api-init: api-composer-install
 
 api-composer-install:
