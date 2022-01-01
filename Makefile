@@ -2,7 +2,6 @@ init: docker-down-clean docker-pull docker-build docker-up api-init
 up: docker-up
 down: docker-down
 restart: down up
-
 docker-up:
 	docker compose up -d
 docker-down:
@@ -14,6 +13,15 @@ docker-pull:
 docker-build:
 	docker-compose build --pull
 
+api-init: api-composer-install api-permissions
+api-composer-install:
+	docker compose run --rm api-php-cli composer install
+api-clear:
+	docker run --rm -v ${PWD}/api:/app -w /app alpine sh -c 'rm -rf var/*'
+api-permissions:
+	docker run --rm -v ${PWD}/api:/app -w /app alpine chmod 777 var
+
+check: lint analyze test
 lint: api-lint
 analyze: api-analyze
 api-lint:
@@ -26,13 +34,26 @@ api-analyze:
 api-analyze-diff:
 	docker-compose run --rm api-php-cli composer psalm
 
-api-init: api-composer-install
-
-api-composer-install:
-	docker compose run --rm api-php-cli composer install
+test: api-test
+test-coverage: api-test-coverage
+test-unit: api-test-unit
+test-unit-coverage: api-test-unit-coverage
+test-functional: api-test-functional
+test-functional-coverage: api-test-functional-coverage
+api-test:
+	docker-compose run --rm api-php-cli composer test
+api-test-coverage:
+	docker-compose run --rm api-php-cli composer test-coverage
+api-test-unit:
+	docker-compose run --rm api-php-cli composer test -- --testsuite=unit
+api-test-unit-coverage:
+	docker-compose run --rm api-php-cli composer test-coverage -- --testsuite=unit
+api-test-functional:
+	docker-compose run --rm api-php-cli composer test -- --testsuite=functional
+api-test-functional-coverage:
+	docker-compose run --rm api-php-cli composer test-coverage -- --testsuite=functional
 
 build: build-gateway build-frontend build-api
-
 build-gateway:
 	docker --log-level=debug build --pull --file=gateway/docker/production/nginx/Dockerfile --tag=${REGISTRY}/auction-gateway:${IMAGE_TAG} gateway/docker
 build-frontend:
@@ -45,7 +66,6 @@ try-build:
 	REGISTRY=localhost IMAGE_TAG=0 make build
 
 push: push-gateway push-frontend push-api
-
 push-gateway:
 	docker push ${REGISTRY}/auction-gateway:${IMAGE_TAG}
 push-frontend:

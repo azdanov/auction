@@ -22,6 +22,7 @@
     "friendsofphp/php-cs-fixer": "^3.4",
     "lctrs/psalm-psr-container-plugin": "^1.7",
     "overtrue/phplint": "^4.0",
+    "phpunit/phpunit": "^9.5",
     "psalm/plugin-phpunit": "^0.16.1",
     "roave/security-advisories": "dev-latest",
     "vimeo/psalm": "^4.16"
@@ -31,10 +32,17 @@
       "App\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\": "tests/"
+    }
+  },
   "scripts": {
     "lint": "phplint",
     "php-cs-fixer": "php-cs-fixer --config=.php-cs-fixer.php --allow-risky=yes",
     "psalm": "psalm",
+    "test": "phpunit --colors=always",
+    "test-coverage": "XDEBUG_MODE=coverage phpunit --colors=always --coverage-html var/test/coverage",
     "app": "php bin/app.php --ansi"
   }
 }
