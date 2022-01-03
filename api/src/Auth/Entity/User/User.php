@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Auth\Entity\User;
 
+use ArrayObject;
 use DateTimeImmutable;
 use DomainException;
 
@@ -12,23 +13,42 @@ final class User
     private Id $id;
     private DateTimeImmutable $date;
     private Email $email;
-    private string $passwordHash;
+    private ?string $passwordHash = null;
     private Status $status;
-    private ?Token $joinConfirmToken;
+    private ?Token $joinConfirmToken = null;
+    private ArrayObject $networks;
 
-    public function __construct(
+    private function __construct(Id $id, DateTimeImmutable $date, Email $email, Status $status)
+    {
+        $this->id = $id;
+        $this->date = $date;
+        $this->email = $email;
+        $this->status = $status;
+        $this->networks = new ArrayObject();
+    }
+
+    public static function requestJoinByEmail(
         Id $id,
         DateTimeImmutable $date,
         Email $email,
         string $passwordHash,
-        Token $joinConfirmToken
-    ) {
-        $this->id = $id;
-        $this->date = $date;
-        $this->email = $email;
-        $this->passwordHash = $passwordHash;
-        $this->status = Status::wait();
-        $this->joinConfirmToken = $joinConfirmToken;
+        Token $token
+    ): self {
+        $user = new self($id, $date, $email, Status::wait());
+        $user->passwordHash = $passwordHash;
+        $user->joinConfirmToken = $token;
+        return $user;
+    }
+
+    public static function joinByNetwork(
+        Id $id,
+        DateTimeImmutable $date,
+        Email $email,
+        Network $network
+    ): self {
+        $user = new self($id, $date, $email, Status::active());
+        $user->networks->append($network);
+        return $user;
     }
 
     public function confirmJoin(string $token, DateTimeImmutable $date): void
@@ -39,6 +59,17 @@ final class User
         $this->joinConfirmToken->validate($token, $date);
         $this->status = Status::active();
         $this->joinConfirmToken = null;
+    }
+
+    public function attachNetwork(Network $network): void
+    {
+        /** @var Network $existing */
+        foreach ($this->networks as $existing) {
+            if ($existing->isEqualTo($network)) {
+                throw new DomainException('Network is already attached.');
+            }
+        }
+        $this->networks->append($network);
     }
 
     public function getId(): Id
@@ -74,5 +105,10 @@ final class User
     public function isActive(): bool
     {
         return $this->status->isActive();
+    }
+
+    public function getNetworks(): array
+    {
+        return $this->networks->getArrayCopy();
     }
 }

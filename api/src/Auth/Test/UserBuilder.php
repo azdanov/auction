@@ -6,6 +6,7 @@ namespace App\Auth\Test;
 
 use App\Auth\Entity\User\Email;
 use App\Auth\Entity\User\Id;
+use App\Auth\Entity\User\Network;
 use App\Auth\Entity\User\Token;
 use App\Auth\Entity\User\User;
 use DateTimeImmutable;
@@ -19,6 +20,7 @@ final class UserBuilder
     private DateTimeImmutable $date;
     private Token $joinConfirmToken;
     private bool $active = false;
+    private ?Network $networkIdentity = null;
 
     public function __construct()
     {
@@ -29,10 +31,38 @@ final class UserBuilder
         $this->joinConfirmToken = new Token(Uuid::uuid4()->toString(), $this->date->modify('+1 day'));
     }
 
+    public function withId(Id $id): self
+    {
+        $clone = clone $this;
+        $clone->id = $id;
+        return $clone;
+    }
+
     public function withJoinConfirmToken(Token $token): self
     {
         $clone = clone $this;
         $clone->joinConfirmToken = $token;
+        return $clone;
+    }
+
+    public function withEmail(Email $email): self
+    {
+        $clone = clone $this;
+        $clone->email = $email;
+        return $clone;
+    }
+
+    public function withPasswordHash(string $passwordHash): self
+    {
+        $clone = clone $this;
+        $clone->passwordHash = $passwordHash;
+        return $clone;
+    }
+
+    public function viaNetwork(Network $network = null): self
+    {
+        $clone = clone $this;
+        $clone->networkIdentity = $network ?? new Network('vk', '0000001');
         return $clone;
     }
 
@@ -45,7 +75,16 @@ final class UserBuilder
 
     public function build(): User
     {
-        $user = new User(
+        if ($this->networkIdentity !== null) {
+            return User::joinByNetwork(
+                $this->id,
+                $this->date,
+                $this->email,
+                $this->networkIdentity
+            );
+        }
+
+        $user = User::requestJoinByEmail(
             $this->id,
             $this->date,
             $this->email,

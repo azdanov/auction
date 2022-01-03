@@ -45,16 +45,20 @@ final class Handler
             throw new DomainException('User already exists.');
         }
 
-        $user = new User(
+        $date = new DateTimeImmutable();
+
+        $user = User::requestJoinByEmail(
             Id::generate(),
-            $now = new DateTimeImmutable(),
+            $date,
             $email,
             $this->hasher->hash($command->password),
-            $token = $this->tokenizer->generate($now),
+            $token = $this->tokenizer->generate($date)
         );
 
         $this->users->add($user);
+
         $this->flusher->flush();
+
         $this->sender->send($email, $token);
     }
 }
