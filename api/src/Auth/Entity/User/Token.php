@@ -25,12 +25,12 @@ final class Token
         if (!$this->isEqualTo($value)) {
             throw new DomainException('Token is invalid.');
         }
-        if ($this->hasExpired($date)) {
+        if ($this->isValidBefore($date)) {
             throw new DomainException('Token has expired.');
         }
     }
 
-    public function hasExpired(DateTimeImmutable $date): bool
+    public function isValidBefore(DateTimeImmutable $date): bool
     {
         return $this->expires <= $date;
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Auth\Test\Entity\User;
+namespace App\Auth\Test\Entity\User\Token;
 
 use App\Auth\Entity\User\Token;
 use DateTimeImmutable;
@@ -11,9 +11,11 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
 /**
+ * @covers \App\Auth\Entity\User\Token
+ *
  * @internal
  */
-final class TokenTest extends TestCase
+final class CreateTest extends TestCase
 {
     public function testSuccess(): void
     {
