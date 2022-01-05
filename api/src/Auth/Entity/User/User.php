@@ -14,11 +14,13 @@ final class User
     private Id $id;
     private DateTimeImmutable $date;
     private Email $email;
-    private ?string $passwordHash = null;
     private Status $status;
-    private ?Token $joinConfirmToken = null;
     private ArrayObject $networks;
+    private ?Email $newEmail = null;
+    private ?string $passwordHash = null;
+    private ?Token $joinConfirmToken = null;
     private ?Token $passwordResetToken = null;
+    private ?Token $newEmailToken = null;
 
     private function __construct(Id $id, DateTimeImmutable $date, Email $email, Status $status)
     {
@@ -106,6 +108,32 @@ final class User
         $this->passwordHash = $hasher->hash($new);
     }
 
+    public function requestEmailChange(Token $token, DateTimeImmutable $date, Email $email): void
+    {
+        if (!$this->isActive()) {
+            throw new DomainException('User is not active.');
+        }
+        if ($this->email->isEqualTo($email)) {
+            throw new DomainException('Current email is equal to the provided email.');
+        }
+        if ($this->newEmailToken !== null && !$this->newEmailToken->isValidBefore($date)) {
+            throw new DomainException('Changing was already requested.');
+        }
+        $this->newEmail = $email;
+        $this->newEmailToken = $token;
+    }
+
+    public function confirmEmailChange(string $token, DateTimeImmutable $date): void
+    {
+        if ($this->newEmail === null || $this->newEmailToken === null) {
+            throw new DomainException('Email change was not requested.');
+        }
+        $this->newEmailToken->validate($token, $date);
+        $this->email = $this->newEmail;
+        $this->newEmail = null;
+        $this->newEmailToken = null;
+    }
+
     public function getId(): Id
     {
         return $this->id;
@@ -149,5 +177,15 @@ final class User
     public function getPasswordResetToken(): ?Token
     {
         return $this->passwordResetToken;
+    }
+
+    public function getNewEmail(): ?Email
+    {
+        return $this->newEmail;
+    }
+
+    public function getNewEmailToken(): ?Token
+    {
+        return $this->newEmailToken;
     }
 }
