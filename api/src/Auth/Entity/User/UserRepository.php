@@ -25,4 +25,6 @@ interface UserRepository
     public function hasByEmail(Email $email): bool;
 
     public function hasByNetwork(Network $network): bool;
+
+    public function remove(User $user): void;
 }

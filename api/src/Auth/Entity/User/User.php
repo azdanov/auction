@@ -16,6 +16,7 @@ final class User
     private Email $email;
     private Status $status;
     private ArrayObject $networks;
+    private Role $role;
     private ?Email $newEmail = null;
     private ?string $passwordHash = null;
     private ?Token $joinConfirmToken = null;
@@ -28,6 +29,7 @@ final class User
         $this->date = $date;
         $this->email = $email;
         $this->status = $status;
+        $this->role = Role::user();
         $this->networks = new ArrayObject();
     }
 
@@ -134,6 +136,18 @@ final class User
         $this->newEmailToken = null;
     }
 
+    public function changeRole(Role $role): void
+    {
+        $this->role = $role;
+    }
+
+    public function remove(): void
+    {
+        if (!$this->isWait()) {
+            throw new DomainException('Unable to remove active user.');
+        }
+    }
+
     public function getId(): Id
     {
         return $this->id;
@@ -187,5 +201,10 @@ final class User
     public function getNewEmailToken(): ?Token
     {
         return $this->newEmailToken;
+    }
+
+    public function getRole(): Role
+    {
+        return $this->role;
     }
 }
