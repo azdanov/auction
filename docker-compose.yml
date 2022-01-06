@@ -33,6 +33,10 @@ services:
       APP_DEBUG: 1
       APP_ENV: dev
       PHP_IDE_CONFIG: "serverName=api-php-fpm"
+      DB_HOST: api-postgres
+      DB_USER: app
+      DB_PASSWORD: secret
+      DB_NAME: app
     volumes:
       - ./api:/app
   api-php-cli:
@@ -42,5 +46,21 @@ services:
     environment:
       APP_DEBUG: 1
       APP_ENV: dev
+      DB_HOST: api-postgres
+      DB_USER: app
+      DB_PASSWORD: secret
+      DB_NAME: app
     volumes:
       - ./api:/app
+  api-postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD_FILE: /run/secrets/api_db_password
+      POSTGRES_DB: app
+    volumes:
+      - api-postgres:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+volumes:
+  api-postgres:
