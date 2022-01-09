@@ -42,7 +42,7 @@ services:
     image: postgres:14-alpine
     environment:
       POSTGRES_USER: app
-      POSTGRES_PASSWORD_FILE: /run/secrets/api_db_password
+      POSTGRES_PASSWORD: ${API_DB_PASSWORD}
       POSTGRES_DB: app
     volumes:
       - api-postgres:/var/lib/postgresql/data
